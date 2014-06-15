@@ -8,33 +8,28 @@
 #include "Tank.h"
 #include <Arduino.h>
 
+//  MIN distance from an object in cm.
+const int MINIMUN_DISTANCE = 20;
+
 //  motor speeds
-const int SPEED_FULL = 255;
 const int SPEED_NONE = 0;
+const int SPEED_HALF = 128;
+const int SPEED_FULL = 255;
 
-Tank::tank() {
-  motor_left = NULL;
-  motor_right = NULL;
-}
+// motor numbers
+const int MOTOR_LEFT = 1;
+const int MOTOR_RIGHT = 4;
 
-void Tank::setLeftMotor(AF_DCMotor motor) {
-  motor_left = motor;
+//  Initialize motors
+AF_DCMotor motor_left(MOTOR_LEFT, MOTOR12_1KHZ);
+AF_DCMotor motor_right(MOTOR_RIGHT, MOTOR12_1KHZ);
+
+void Tank::setMotors () {
   motor_left.setSpeed(SPEED_FULL);
   motor_left.run(RELEASE);
-}
 
-void Tank::setRightMotor(AF_DCMotor motor) {
-  motor_right = motor;
   motor_right.setSpeed(SPEED_FULL);
   motor_right.run(RELEASE);
-}
-
-AF_DCMotor Tank::getLeftMotor() {
-  return motor_left;
-}
-
-AF_DCMotor Tank::getRightMotor() {
-  return motor_right;
 }
 
 void Tank::stop() {
@@ -43,12 +38,17 @@ void Tank::stop() {
 }
 
 void Tank::turnAround() {
-  motor_left.run(BACKWARD);
-  motor_right.run(FORWARD);
-  delay(1000);
-  motor_left.run(FORWARD);
-  motor_right.run(BACKWARD);
-  delay(1000);
+  stop();
+  int i = 0;
+  motor_left.setSpeed(SPEED_HALF);
+  motor_right.setSpeed(SPEED_HALF);
+  while(i++<1800) {
+    motor_left.run(BACKWARD);
+    motor_right.run(FORWARD);
+  }
+  motor_left.setSpeed(SPEED_FULL);
+  motor_right.setSpeed(SPEED_FULL);
+  stop();
 }
 
 void Tank::goForward(){
@@ -61,10 +61,11 @@ void Tank::goBackward(){
   motor_right.run(BACKWARD);
 }
 
-void Tank::commandTank(long distance_cm) {
-  if (distance_cm <= 10) {
-    goBackward();
-//    turnAround();
+void Tank::exploreAround(long distance_cm) {
+  if (distance_cm<=MINIMUN_DISTANCE) {
+    stop();
+    goBackward(); delay(4000);
+    turnAround();
   } else {
     goForward();
   }

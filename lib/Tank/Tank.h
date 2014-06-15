@@ -9,17 +9,10 @@
 
 class Tank {
 public:
-	tank();
-	void setLeftMotor(AF_DCMotor motor);
-	void setRightMotor(AF_DCMotor motor);
-	AF_DCMotor getLeftMotor();
-	AF_DCMotor getRightMotor();
   	void stop();
-  	void turnAround();
+	void setMotors();
   	void goForward();
   	void goBackward();
-  	void commandTank(long distance_cm);
-private:
-	AF_DCMotor motor_left;
-  	AF_DCMotor motor_right;
+  	void turnAround();
+  	void exploreAround(long distance_cm);
 };
